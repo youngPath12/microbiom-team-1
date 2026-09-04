@@ -1,4 +1,4 @@
-# METIS 기반 AI 배양조건 최적화 — 진행 기록 20260904 (README)
+# METIS 기반 AI 배양조건 최적화 — 진행 기록 (README)
 
 수도권 도로변·공원 토양 유래 분리주 *Priestia megaterium*의 배지 조성 최적화를
 [METIS](https://github.com/amirpandi/METIS)(Pandi et al., *Nat. Commun.*, 2022) 능동학습 프레임워크로 진행한 과정 전체 기록.
@@ -18,17 +18,17 @@
 ### 2-1. 실험 설계
 팀원 3명(인영, 유라, 정관)이 각자 4개씩, 총 **12개 배지 조합**을 배양하여 OD600을 측정함.
 
-- 인영(조건 1~4): 전 성분 동일 비율로 25/50/75/100% 스크리닝
-- 유라(조건 5~8): 기준 50/50/50/50에서 한 성분씩 100%로 올리는 OVAT(One-Variable-At-a-Time) 방식
-- 정관(조건 9~12): 50~75% 구간의 부분 조합
+- 인영(조건 1–4): 전 성분 동일 비율로 25/50/75/100% 스크리닝
+- 유라(조건 5–8): 기준 50/50/50/50에서 한 성분씩 100%로 올리는 OVAT(One-Variable-At-a-Time) 방식
+- 정관(조건 9–12): 50–75% 구간의 부분 조합
 
 > 이 12개 조합 자체는 METIS가 무작위 생성한 것이 아니라 **팀원이 수동으로 설계한 초기 스크리닝**임. 이 데이터를 모델 학습에 사용하는 단계부터가 실질적인 "머신러닝" 단계.
 
 ### 2-2. OD 측정 및 yield 값 결정
-각 조합을 1차, 2차 두 번 측정함. 두 값 중 **2차 값만 최종 yield로 채택** (1차보다 재현성이 더 좋다고 판단).
+각 조합을 1차, 2차 두 번 측정함. **1차는 12개 조합을 한 매트릭스(플레이트)에 배치해 한 번에 측정한 값**이고, **2차는 그중 각 조건을 다시 개별적으로 설정해서 따로 측정한 값**임. 매트릭스 방식보다 조건을 개별로 설정해 측정한 2차 쪽이 조건 간 교차 영향(웰 간 간섭 등)이 적어 더 신뢰할 수 있다고 판단하여, **2차 값만 최종 yield로 채택**함.
 
 ### 2-3. 실제 농도값 매핑
-팀 엑셀(`METIS_배양조건_결과.xlsx`)에 정리된 "조건 1~12(비율 %)"는 팀 자체 기록용 라벨이며, 실제 모델 입력에는 **엑셀의 "Concentration" 표에 있는 실제 농도값**(g/L 단위, Peptone/Meat/Yeast/Glucose)을 사용함.
+팀 엑셀(`METIS_배양조건_결과.xlsx`)에 정리된 "조건 1–12(비율 %)"는 팀 자체 기록용 라벨이며, 실제 모델 입력에는 **엑셀의 "Concentration" 표에 있는 실제 농도값**(g/L 단위, Peptone/Meat/Yeast/Glucose)을 사용함.
 
 ### 2-4. 최종 Results_1.csv
 
@@ -124,7 +124,7 @@ exploitation(예측 수율) + exploration(불확실성) 균형을 고려한 다�
 | 5.0 | 12.00 | 4.32 | 10.0 |
 | 5.0 | 11.84 | 4.08 | 10.0 |
 
-> 실제 2라운드 습식 실험은 진행하지 않기로 결정 (시간 제약).
+> 실제 3라운드 습식 실험은 진행하지 않기로 결정 (시간 제약).
 
 ### 4-4. 예측 최적 조성 (전체 탐색공간 5,000개 무작위 샘플 중 exploitation-only 최댓값)
 
@@ -134,10 +134,10 @@ exploitation(예측 수율) + exploration(불확실성) 균형을 고려한 다�
 | 5.0 | 9.92 | 0.40 | 10.0 | 0.856 |
 | 5.0 | 10.88 | 0.40 | 10.0 | 0.856 |
 
-> 1라운드 실측 최고값(yield=0.879, Yeast=0.08)이 모델 예측 최적값(0.856)보다 높음 — 학습 데이터가 12개로 적어 발생하는 한계로 해석.
+> 2라운드 실측 최고값(yield=0.879, Yeast=0.08)이 모델 예측 최적값(0.856)보다 높음 — 학습 데이터가 12개로 적어 발생하는 한계로 해석.
 
 ### 4-5. K Most Informative Combinations — ⚠️ 참고용
-"12개 중 몇 개만으로도 나머지를 잘 예측할 수 있는가"를 테스트. k=8로 시도했으나 **테스트셋이 4개뿐이라 결과가 불안정**(성능 분포 0~1, 평균 0.364). 데이터가 더 쌓이기 전까지는 메인 결과로 사용하지 않기로 함.
+"12개 중 몇 개만으로도 나머지를 잘 예측할 수 있는가"를 테스트. k=8로 시도했으나 **테스트셋이 4개뿐이라 결과가 불안정**(성능 분포 0–1, 평균 0.364). 데이터가 더 쌓이기 전까지는 메인 결과로 사용하지 않기로 함.
 
 ### 4-6. NonLinear Interactions — ✅ 채택
 성분 쌍별로 상호작용항(곱)을 추가했을 때 예측 성능(Pearson r)이 얼마나 개선되는지 측정.
@@ -155,7 +155,46 @@ exploitation(예측 수율) + exploration(불확실성) 균형을 고려한 다�
 
 ---
 
-## 5. 이번 라운드에서 스킵한 노트북 섹션과 이유
+## 5. 코드 참고 가이드 (검증용 — 결과별 출처)
+
+확인하시는 분이 "이 결과가 어느 코드에서 나왔는지" 바로 찾을 수 있도록, 결과별로 실행한 코드와 실행 결과가 노트북 어디에 있는지 정리함. (셀 번호는 파일마다 밀릴 수 있어 **코드 내용 기준**으로 표기)
+
+| README의 결과 | 실행한 코드(첫 줄 기준) | 실행 결과가 보이는 위치 |
+|---|---|---|
+| §2-4 Results_1.csv 12행 | 코드 아님 — `METIS_배양조건_결과.xlsx`의 "Concentration" 표를 직접 정리 | 엑셀 원본, 코드 실행 결과 아님 |
+| §4-1, 4-2 모델 학습 + Feature Importance | `Results_1 = pd.read_csv('Results_1.csv', encoding='utf-8-sig')`로 시작하는 통합 코드 셀 (BOM 수정 반영판) | 셀 실행 직후 출력되는 `컬럼명 확인:`, `앙상블 학습 완료: 20 개 모델` 로그 + `feature_importance.png` |
+| §4-3 Day 2 추천 조합 | 같은 통합 코드 셀의 `bayesian_optimization(...)` 부분 | `=== Day 2 추천 조합 ===` 출력 표 |
+| §4-4 예측 최적 조성 Top5 | `pool = random_combination_generator(...)` 로 시작하는 추가 코드 셀 | `=== AI 예측 최적 배지 조성 Top 5 ===` 출력 표 |
+| §4-5 K Most Informative Combinations | 노트북의 **"Find K Most Informative Combinations"** 섹션(마크다운 헤더 기준) — `k = 20` 으로 시작하는 코드 블록들 (본 분석에서는 `k=8`로 수정해 실행) | `df_perfomance.iloc[0:5, :]` 출력, `K_Most_Informative_Combinations.csv` |
+| §4-6 NonLinear Interactions | 노트북의 **"Find NonLinear Interactions"** 섹션 — `from sklearn.linear_model import LinearRegression`으로 시작하는 코드 블록들 | `interactions_df` 출력 + `Interactions.png`/`Interactions.csv` |
+
+> 노트북에서 마크다운 헤더(`#`로 시작하는 셀)를 검색하면 각 섹션 시작 지점을 빠르게 찾을 수 있음. Colab 좌측 목차(≡ 아이콘)에서도 섹션별로 바로 이동 가능.
+
+---
+
+## 6. 논문 Results 섹션 반영 가이드
+
+지금까지 나온 결과 중 **무엇을 메인으로, 무엇을 보조로 넣을지** 정리.
+
+| 결과 | 반영 여부 | 넣을 위치 |
+|---|---|---|
+| Feature Importance (§4-2) | ✅ 메인 | Results 1번째 문단 + Figure (막대그래프) |
+| 예측 최적 조성 Top5 (§4-4) | ✅ 메인 | Results 2번째 문단 + Table |
+| NonLinear Interactions (§4-6) | ✅ 메인 (권장) | Results 3번째 문단 + Figure (히트맵) — Peptone 상호작용 언급 |
+| Day 2 추천 조합 (§4-3) | △ 보조 | Discussion·한계점에서 "향후 라운드 방향"으로 짧게 언급 (실험 미실행이므로 Results 본문 메인으로는 비추천) |
+| K Most Informative Combinations (§4-5) | ✕ 보류 | 넣지 않거나, 넣더라도 Limitations에 "표본 수 부족으로 신뢰도 낮음"이라고 명시. 메인 Results에는 비추천 |
+
+### 권장 서술 순서 (Results)
+1. **Feature Importance** — "어떤 성분이 중요한가" (전체 그림 먼저 제시)
+2. **예측 최적 조성** — "그래서 최적 조합은 무엇으로 예측되는가" + 실측 최고값과 비교하며 한계 언급
+3. **Interaction 분석** — "단일 변수로는 안 보이던 것" (Peptone의 숨은 역할) → 논문에 깊이를 더하는 포인트
+4. (Discussion) Day 2 추천 조합 + K-informative는 "후속 라운드로 확장 가능하다"는 향후 연구 방향으로 짧게 마무리
+
+이 순서(Importance → 예측 최적값 → Interaction)로 가면 "무엇이 중요한지 → 그래서 최적은 무엇인지 → 놓치기 쉬운 심화 포인트" 흐름이 자연스럽게 이어짐.
+
+---
+
+## 7. 이번 라운드에서 스킵한 노트북 섹션과 이유
 
 | 섹션 | 스킵 이유 |
 |---|---|
@@ -166,22 +205,22 @@ exploitation(예측 수율) + exploration(불확실성) 균형을 고려한 다�
 
 ---
 
-## 6. 산출 파일 목록
+## 8. 산출 파일 목록
 
-- `Results_1.csv` — 1라운드 실측 데이터 (Peptone/Meat/Yeast/Glucose/yield)
+- `Results_1.csv` — 2라운드 실측 데이터 (Peptone/Meat/Yeast/Glucose/yield)
 - `feature_importance.png` — Feature Importance 막대그래프
-- `Day_2/Concentrations_2.csv`, `Day_2/Volumes_2.csv` — 2라운드 추천 농도·부피 (미실행)
+- `Day_2/Concentrations_2.csv`, `Day_2/Volumes_2.csv` — 다음(3라운드) 추천 농도·부피 (미실행, 파일명의 "2"는 METIS 내부 Day 번호로 팀 라운드 번호와는 별개)
 - `Interactions.png`, `Interactions.csv` — 성분 간 상호작용 히트맵
 
-## 7. 논문 반영 상태
+## 9. 논문 반영 상태
 
 - Materials and methods → Data analysis 섹션: 작성 완료
 - Results 섹션: Feature Importance, 예측 최적조합 Top5 작성 완료 (Figure/Table 삽입 자리만 남음)
 - Interaction 결과: 아직 Results 문단 미작성
 
-## 8. 남은 TODO
+## 10. 남은 TODO
 
-- [ ] Interaction 결과를 Results 문단에 추가
+- [ ] §6 가이드대로 Interaction 결과를 Results 문단에 추가
 - [ ] Feature Importance 그래프(`feature_importance.png`), Interaction 히트맵(`Interactions.png`) 실제 이미지 논문에 삽입
 - [ ] Glucose `Conc_Stock` 값(200 vs 400) 실제 스탁 기록과 대조 확인
-- [ ] (선택) 2라운드 습식 실험 진행 여부 최종 확정
+- [ ] (선택) 3라운드 습식 실험 진행 여부 최종 확정
