@@ -27,3 +27,6 @@ To identify the predicted optimal medium composition, the trained ensemble was u
 ---
 
 `[Figure X]`, `[Table X]` 표시된 자리에 나중에 실제 그래프(bar chart 이미지)와 표를 넣으시면 됩니다. Figure/Table 번호는 논문 전체 번호 체계에 맞춰 바꿔주세요.
+
+<img width="425" height="280" alt="image" src="https://github.com/user-attachments/assets/5bebb8fd-f347-4490-a188-8ac125541d66" />
+
