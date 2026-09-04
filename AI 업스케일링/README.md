@@ -52,34 +52,6 @@
 | 11 | 5 | 0.0 | 7.6 | 30 | 0.758 |
 | 12 | 5 | 15.2 | 0.0 | 20 | 0.761 |
 
-<details>
-<summary>CSV 원본 (클릭해서 펼치기)</summary>
-
-```csv
-Peptone,Meat,Yeast,Glucose,yield
-20,12.8,0.48,20,0.712
-5,8.96,0.08,30,0.879
-10,15.2,3.68,10,0.801
-5,4.0,3.44,1,0.812
-5,8.16,3.36,30,0.796
-1,13.76,7.68,1,0.602
-5,15.68,8.0,30,0.571
-10,8.96,6.48,30,0.726
-10,1.12,4.48,20,0.703
-10,11.52,6.24,1,0.799
-5,0.0,7.6,30,0.758
-5,15.2,0.0,20,0.761
-```
-
-</details>
-
-### 2-5. 겪었던 문제와 해결
-
-| 문제 | 원인 | 해결 |
-|---|---|---|
-| `aggregated_data_m`이 빈 표로 출력됨 | `day_finder('Results')`가 `Results_1.csv`를 못 찾아 `day=0`이 되고, `range(start_day, day+1)`이 빈 범위가 됨 (업로드 전에 셀을 실행했거나 파일명이 다름) | 파일 업로드 후 `day_finder` 셀부터 재실행 |
-| 컬럼명이 `Peptone`이 아니라 인식됨 (KeyError 위험) | 엑셀 → CSV 저장 시 파일 맨 앞에 **UTF-8 BOM**이 붙어 첫 컬럼명이 `﻿Peptone`으로 저장됨 | `pd.read_csv('Results_1.csv', encoding='utf-8-sig')`로 BOM 자동 제거 |
-
 ---
 
 ## 3. 사전 설정값 (User Inputs)
@@ -223,7 +195,7 @@ exploitation(예측 수율) + exploration(불확실성) 균형을 고려한 다�
 - Results 섹션: Feature Importance, 예측 최적조합 Top5 작성 완료 (Figure/Table 삽입 자리만 남음)
 - Interaction 결과: 아직 Results 문단 미작성
 
-## 10. Results 최종 초안 (그대로 복붙 가능)
+## 10. Results 최종 초안
 
 §6 가이드 순서(Feature Importance → 예측 최적값 → Interaction) 그대로 이어지는 **하나의 연속된 Results 문단**. Figure/Table 번호는 논문 전체 번호 체계에 맞춰 바꾸면 됨.
 
@@ -253,7 +225,7 @@ To examine whether the effects of medium components on growth yield were purely 
 
 ---
 
-## 12. Abstract 최종 초안 (그대로 복붙 가능)
+## 12. Abstract 최종 초안 
 
 ### English
 
@@ -267,7 +239,7 @@ Urban soils harbor structurally complex and functionally diverse bacterial commu
 
 ---
 
-## 13. Introduction 최종 초안 (그대로 복붙 가능)
+## 13. Introduction 최종 초안 
 
 ### English
 
