@@ -24,8 +24,13 @@
 
 > 이 12개 조합 자체는 METIS가 무작위 생성한 것이 아니라 **팀원이 수동으로 설계한 초기 스크리닝**임. 이 데이터를 모델 학습에 사용하는 단계부터가 실질적인 "머신러닝" 단계.
 
-### 2-2. OD 측정 및 yield 값 결정
-각 조합을 1차, 2차 두 번 측정함. **1차는 12개 조합을 한 매트릭스(플레이트)에 배치해 한 번에 측정한 값**이고, **2차는 그중 각 조건을 다시 개별적으로 설정해서 따로 측정한 값**임. 매트릭스 방식보다 조건을 개별로 설정해 측정한 2차 쪽이 조건 간 교차 영향(웰 간 간섭 등)이 적어 더 신뢰할 수 있다고 판단하여, **2차 값만 최종 yield로 채택**함.
+### 2-2. 1차 → 2차: 이미 한 차례 METIS 최적화를 거친 데이터
+- **1차**: 코덱스(Codex)를 이용해 임의로 설정한 12개 배지 조합으로 배양 후 OD 측정
+- 이 1차 조건과 OD 값을 **METIS에 입력해 학습** → 모델이 추천하는 개선된 조건으로 재설정
+- **2차**: METIS가 추천한 조건으로 다시 배양하여 OD 측정
+- **2차 OD가 1차보다 전반적으로 높게 나와, AI(METIS) 기반 최적화가 실제로 유효하다고 판단** → 이 논리로 "AI 스케일업이 유용했다"는 근거를 확보
+- 따라서 §2-4의 `Results_1.csv`는 1차 원본이 아니라 **이미 METIS 최적화를 한 차례 거친 2차 결과**이며, 이 문서의 §4 이후 분석(모델 재학습, Day 2 추천 등)은 이 2차 데이터를 기반으로 한 **추가 라운드(3차) 추천**에 해당함
+- 이후 더 나은 yield를 원한다면, 2차 조건+OD를 다시 METIS에 입력해 반복 실험(3차)을 진행하면 됨
 
 ### 2-3. 실제 농도값 매핑
 팀 엑셀(`METIS_배양조건_결과.xlsx`)에 정리된 "조건 1–12(비율 %)"는 팀 자체 기록용 라벨이며, 실제 모델 입력에는 **엑셀의 "Concentration" 표에 있는 실제 농도값**(g/L 단위, Peptone/Meat/Yeast/Glucose)을 사용함.
@@ -218,9 +223,30 @@ exploitation(예측 수율) + exploration(불확실성) 균형을 고려한 다�
 - Results 섹션: Feature Importance, 예측 최적조합 Top5 작성 완료 (Figure/Table 삽입 자리만 남음)
 - Interaction 결과: 아직 Results 문단 미작성
 
-## 10. 남은 TODO
+## 10. Results 최종 초안 (그대로 복붙 가능)
 
-- [ ] §6 가이드대로 Interaction 결과를 Results 문단에 추가
-- [ ] Feature Importance 그래프(`feature_importance.png`), Interaction 히트맵(`Interactions.png`) 실제 이미지 논문에 삽입
+§6 가이드 순서(Feature Importance → 예측 최적값 → Interaction) 그대로 이어지는 **하나의 연속된 Results 문단**. Figure/Table 번호는 논문 전체 번호 체계에 맞춰 바꾸면 됨.
+
+### English
+
+Using the ensemble model trained on the twelve initial medium compositions, relative feature importance was calculated for each of the four medium components. Yeast extract was identified as the most influential component (mean importance = 0.45 ± 0.08), followed by meat extract (0.30 ± 0.10), peptone (0.17 ± 0.09), and glucose (0.08 ± 0.02) [Figure 1].
+
+To identify the predicted optimal medium composition, the trained ensemble was used to evaluate 5,000 randomly sampled candidate compositions within the defined concentration space. The candidate compositions with the highest ensemble-mean predicted yield converged on a narrow region characterized by low yeast extract (0.16–0.40 g/L), intermediate meat extract (9.76–10.88 g/L), low peptone (5.0 g/L), and low-to-moderate glucose (1–10 g/L), with predicted yields of approximately 0.856 [Table 1]. This predicted optimum is consistent with the high feature importance of yeast extract reported above, indicating that low yeast extract concentrations are associated with higher predicted growth yield within the tested composition space. Notably, this predicted maximum did not exceed the highest yield observed among the twelve experimentally tested conditions (0.879, at peptone 5, meat extract 8.96, yeast extract 0.08, glucose 30 g/L), likely reflecting the limited size of the training dataset.
+
+To examine whether the effects of medium components on growth yield were purely additive, pairwise nonlinear interactions among the four components were evaluated by comparing linear regression models with and without an interaction term for each component pair. Peptone showed the strongest interaction effects, particularly with glucose (Δr = +0.128) and yeast extract (Δr = +0.123), despite ranking third among the four components in individual feature importance. In contrast, interactions involving meat extract and glucose (Δr = +0.022), meat extract and yeast extract (Δr = +0.006), yeast extract and glucose (Δr = +0.001), and peptone and meat extract (Δr = 0.000) were minimal [Figure 2]. These results indicate that the effect of peptone on growth yield is context-dependent, modulated by the concentrations of glucose and yeast extract, rather than acting independently as its individual feature importance alone would suggest.
+
+### 국문 해석
+
+12개의 초기 배지 조성으로 학습된 앙상블 모델을 이용해, 4개 배지 성분 각각의 상대적 변수 중요도를 산출하였다. Yeast extract가 가장 영향력이 큰 성분으로 확인되었으며(평균 중요도 0.45 ± 0.08), 이어서 meat extract(0.30 ± 0.10), peptone(0.17 ± 0.09), glucose(0.08 ± 0.02) 순으로 나타났다 [Figure 1].
+
+예측 최적 배지 조성을 식별하기 위해, 학습된 앙상블 모델을 이용해 정의된 농도 공간 내에서 무작위로 샘플링한 5,000개의 후보 조성의 수율을 평가하였다. 앙상블 평균 예측 수율이 가장 높았던 후보 조성들은 낮은 yeast extract 농도(0.16–0.40 g/L), 중간 수준의 meat extract 농도(9.76–10.88 g/L), 낮은 peptone 농도(5.0 g/L), 낮음-중간 수준의 glucose 농도(1–10 g/L)로 구성된 좁은 영역에 수렴하였으며, 예측 수율은 약 0.856이었다 [Table 1]. 이러한 예측 최적 조성은 앞서 확인된 yeast extract의 높은 변수 중요도와 일치하는 결과로, 시험된 조성 공간 내에서 낮은 yeast extract 농도가 더 높은 예측 생장 수율과 연관됨을 시사한다. 다만 이 예측 최댓값(0.856)은 실제로 시험된 12개 조건 중 관찰된 최고 수율(0.879; peptone 5, meat extract 8.96, yeast extract 0.08, glucose 30 g/L)을 넘어서지 못하였는데, 이는 학습 데이터의 크기가 제한적이었기 때문으로 판단된다.
+
+배지 성분이 생장 수율에 미치는 영향이 순수하게 가산적(additive)인지 확인하기 위해, 성분 쌍마다 상호작용항을 포함한 선형회귀모델과 포함하지 않은 모델을 비교하여 비선형 상호작용을 평가하였다. Peptone은 개별 변수 중요도에서는 4개 성분 중 3위에 그쳤음에도 불구하고, glucose(Δr = +0.128) 및 yeast extract(Δr = +0.123)와 가장 강한 상호작용 효과를 보였다. 반면 meat extract와 glucose(Δr = +0.022), meat extract와 yeast extract(Δr = +0.006), yeast extract와 glucose(Δr = +0.001), peptone과 meat extract(Δr = 0.000) 간의 상호작용은 미미하였다 [Figure 2]. 이러한 결과는 peptone이 생장 수율에 미치는 영향이 개별 변수 중요도만으로 시사되는 것과 달리 독립적으로 작용하기보다는, glucose와 yeast extract의 농도에 따라 조절되는 맥락 의존적(context-dependent) 성격을 가짐을 시사한다.
+
+---
+
+## 11. 남은 TODO (실제로 사람이 결정/확인해야 하는 것만)
+
+- [ ] §10의 Results 최종 초안을 워드 파일에 붙여넣고, `[Figure 1]`/`[Table 1]`/`[Figure 2]` 자리에 `feature_importance.png`, Top5 표, `Interactions.png` 이미지·표 삽입
 - [ ] Glucose `Conc_Stock` 값(200 vs 400) 실제 스탁 기록과 대조 확인
 - [ ] (선택) 3라운드 습식 실험 진행 여부 최종 확정
