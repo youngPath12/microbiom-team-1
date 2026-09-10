@@ -1,0 +1,5 @@
+feature,importance_mean,importance_std
+Meat,0.32517543,0.105124764
+Yeast,0.297367,0.05091104
+Glucose,0.296032,0.07107576
+Peptone,0.081425585,0.07708497

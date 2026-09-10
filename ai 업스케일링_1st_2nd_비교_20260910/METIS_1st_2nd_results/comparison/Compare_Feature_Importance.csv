@@ -1,0 +1,9 @@
+feature,importance_mean,importance_std,day
+Peptone,0.2742714,0.06823133,1st day
+Meat,0.47873378,0.07938142,1st day
+Yeast,0.14249547,0.06894702,1st day
+Glucose,0.104499325,0.04919106,1st day
+Peptone,0.081425585,0.07708497,2nd day
+Meat,0.32517543,0.105124764,2nd day
+Yeast,0.297367,0.05091104,2nd day
+Glucose,0.296032,0.07107576,2nd day
